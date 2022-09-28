@@ -1,0 +1,50 @@
+{
+    'trainer': {
+        'opt': {
+            '': 'ADAM',
+            'lr': 1e-4,
+        },
+        'model': {
+            '': 'MNIST',
+            'dim': 28,
+            'size': 16,
+            'kernel_size': 5,
+            'in_channels': 1,
+            'scale_factor': 2,
+            'hidden_layer_size': 64,
+        },
+        'batch_sz': 50,
+        'eval_batch_sz': 200,
+        'max_train_steps': 100000,
+        'output_steps': 100,
+        'summary_steps': 100,
+        'base_dir': '.',
+
+        'train_adversary': {'': 'ID'},
+    },
+    'eval': {
+        'final_metrics': {
+            'adversaries': [{'': 'ID'}],
+            'metrics': ['loss', 'accuracy'],
+        }
+    },
+    'adversaries': {
+        'ID': {
+            '': 'ID',
+        },
+        'FGSM': {
+            '': 'FGSM',
+            'eps': 0.3,
+            'norm': 'linf',
+            'random_start': false,
+        },
+        'PGD': {
+            '': 'PGD',
+            'eps': 0.3,
+            'norm': 'linf',
+            'k': 40,
+            'a': 0.01,
+            'random_start': true,
+        },
+    },
+}
