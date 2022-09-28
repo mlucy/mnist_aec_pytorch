@@ -32,3 +32,30 @@ Overall these look very similar.  Our capacity 4/8 seems to be
 behaving slightly differently, not sure why, should probably re-run
 the training and see if it was just an outlier.
 
+# Experiment 3 (Table 1)
+
+## Theirs:
+
+![](exp3_theirs.png)
+
+## Ours:
+
+![](exp3.png)
+
+## Thoughts
+
+TODO, Targeted, Source B
+
+# Experiment 4 (Figure 6):
+
+## Theirs:
+
+![](exp4_theirs.png)
+
+## Ours:
+
+![](exp4.png)
+
+## Thoughts
+
+TODO
