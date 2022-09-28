@@ -62,11 +62,17 @@ That seems suspicious to me, I should double-check the training code.
 
 ## Thoughts
 
-I'm not sure what their "Targeted" attack is, and I had to guess some
-of the details for the CW/CW+ attacks.  I haven't looked into model B
-yet.
+Everything mostly matches up, our accuracy numbers seem very slightly
+higher.
 
-TODO: why are our restart numbers so high?
+TODO:
+
+* Our accuracy numbers for restarts=20 seem wrong, probably a bug.
+* I don't understand the attack they labeled "Targetted", I can't seem
+  to find where they describe it in the paper.
+* I don't know what to set the convidence parameter to for CW (for CW+
+  they specify 50).  I ended up going with 20 (see comments in
+  exp3.py).
 
 # Experiment 4 (Figure 6):
 

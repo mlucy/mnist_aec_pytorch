@@ -1,10 +1,6 @@
 ## TODO
-* Implement Targeted, CW, and CW+ adversaries for exp3
-* exp4
 
-* https://arxiv.org/pdf/1608.04644.pdf discretizes pixel values to be
-  in [0, 256) and then does lattice search if that isn't good enough.
-  This paper seems to just let us pass arbitrary floats.  Try it both ways?
+* Our PGD-with-restarts seems like is has a bug.
 
 * Add a requirements file.
 
@@ -12,6 +8,10 @@
   parallel without re-doing work?
 
 ## Thoughts
+
+* https://arxiv.org/pdf/1608.04644.pdf discretizes pixel values to be
+  in [0, 256) and then does lattice search if that isn't good enough.
+  This paper seems to just let us pass arbitrary floats.  Try it both ways?
 
 * Because of the way volume in high dimensions works, our random
   starts are usually very close to the surface of the n-cube or n-ball

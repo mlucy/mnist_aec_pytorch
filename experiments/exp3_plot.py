@@ -20,6 +20,7 @@ ax.axis('tight')
 
 res = res[['name', 'steps', 'restarts', 'source', 'accuracy', 'theirs']]
 res.update(res[['accuracy']].applymap(lambda x: f'{x:.3f}'))
+res.update(res[['theirs']].applymap(lambda x: f'{x:.3f}'))
 res.update(res.applymap(
     lambda x: f'{x:g}' if isinstance(x, float) else x
 ))
