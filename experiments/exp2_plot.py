@@ -22,9 +22,9 @@ xs = res['test']['step'].to_numpy()
 ys = res['test']['loss'].to_numpy()
 ax.plot(xs, ys, color='blue', label='test')
 
-xs = res['train']['step'].to_numpy()
-ys = res['train']['test_loss'].to_numpy()
-ax.plot(xs, ys, color='red', label='train')
+# xs = res['train']['step'].to_numpy()
+# ys = res['train']['test_loss'].to_numpy()
+# ax.plot(xs, ys, color='red', label='train')
 
 fig.legend()
 fig.tight_layout()

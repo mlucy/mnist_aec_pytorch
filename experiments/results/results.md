@@ -1,4 +1,16 @@
+# Overview
+
 All results are compared to https://arxiv.org/pdf/1706.06083.pdf
+
+I reproduced the graphs in section 5, Experiments, for MNIST but not
+for CIFAR.  It would potentially be interesting to reproduce figures 1
+and 2 from the earlier sections as well.
+
+Their adversarial training scheme is super slow (40 steps of PGD per
+outer step of training), so I didn't reproduce the CIFAR results yet.
+
+
+
 
 # Experiment 1 (Figure 4)
 

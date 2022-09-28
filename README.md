@@ -1,11 +1,11 @@
 ## TODO
 * Implement Targeted, CW, and CW+ adversaries for exp3
 * exp4
-* Go back and do exp0 for pg. 6/7?
 
 * https://arxiv.org/pdf/1608.04644.pdf discretizes pixel values to be
   in [0, 256) and then does lattice search if that isn't good enough.
   This paper seems to just let us pass arbitrary floats.  Try it both ways?
+
 
 
 ## Thoughts
@@ -21,9 +21,7 @@
   this would behave if we patched the ReLU units to pass through
   gradients as if they were softmax (just lie basically)?
 
-* I wonder how things behave if instead of training against
-  adversarial attacks within an epsilon ball, the value of epsilon is
-  sampled at training time from some distribution?
+* I wonder how things behave if instead of training against adversarial attacks within an epsilon ball, the value of epsilon is sampled at training time from some distribution?  Would that get similar results without the sharp dropoff past that epsilon ball?
 
 * The only scaling experiments look at width, I wonder how depth
   affects things?
