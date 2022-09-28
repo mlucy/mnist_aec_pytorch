@@ -40,9 +40,9 @@ the training and see if it was just an outlier.
 
 ## Thoughts
 
-Overall these look very similar.  Our capacity 4/8 seems to be
-behaving slightly differently, not sure why, should probably re-run
-the training and see if it was just an outlier.
+Overall these look very similar.  We seem to bottom out and start
+rising in loss earlier than they do and at a slightly higher loss.
+That seems suspicious to me, I should double-check the training code.
 
 # Experiment 3 (Table 1)
 
@@ -56,7 +56,9 @@ the training and see if it was just an outlier.
 
 ## Thoughts
 
-TODO, Targeted, Source B
+I'm not sure what their "Targeted" attack is, and I had to guess some
+of the details for the CW/CW+ attacks.  I haven't looked into model B
+yet.  Otherwise very similar.
 
 # Experiment 4 (Figure 6):
 
@@ -70,4 +72,6 @@ TODO, Targeted, Source B
 
 ## Thoughts
 
-TODO
+I haven't implemented the decision boundary attack yet.  Otherwise
+very similar, the brown line in the first graph bottoms out faster for
+them.
