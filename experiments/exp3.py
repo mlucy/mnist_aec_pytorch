@@ -3,6 +3,7 @@ import copy
 import pprint
 import torch
 import os
+import re
 
 import sys
 import pathlib
@@ -29,7 +30,7 @@ config['other_trainers'] = {
     }
 }
 
-config['eval']['final_metrics']['adversaries'] = [
+adversaries = [
     {'': 'ID', 'theirs': .988},
     {**config['adversaries']['FGSM'], 'theirs': .956},
     {**config['adversaries']['PGD'], 'k': 40, 'restarts': 1, 'theirs': .932},
@@ -39,14 +40,22 @@ config['eval']['final_metrics']['adversaries'] = [
     {**config['adversaries']['PGD'], 'k': 100, 'restarts': 1, 'theirs': .918},
     {**config['adversaries']['PGD'], 'k': 40, 'restarts': 20, 'theirs': .904},
     {**config['adversaries']['PGD'], 'k': 100, 'restarts': 20, 'theirs': .893},
+
     # TODO: What the fuck is this "targeted" row?  I might just be
     # blind but I can't find it defined anywhere.  Maybe it's just
     # CW with a specific target class?
-
     # Targeted 40 1 A
-    {**config['adversaries']['PGD'], '': 'CW', 'name': 'CW', 'theirs': .940},
-    {**config['adversaries']['PGD'],
-     '': 'CW', 'k': 50, 'name': 'CW+', 'theirs': .939},
+
+    # TODO: I don't know what confidence to put for the CW adversary.
+    # The paper doesn't say, and 0 gives results that don't match
+    # theirs (while 50 matches their CW+ quite well).  I went with 20
+    # because it seems to give roughly the right numbers and the CW
+    # paper mentions it as the success plateaux for transfer attacks
+    # (pg. 15).
+    {**config['adversaries']['PGD'], '': 'CW', 'name': 'CW',
+     'confidence': 20, 'restarts': 1, 'theirs': .940},
+    {**config['adversaries']['PGD'], '': 'CW', 'name': 'CW+',
+     'confidence': 50, 'restarts': 1, 'theirs': .939},
 
     {**config['adversaries']['FGSM'], 'model': "A'", 'theirs': .968},
     {**config['adversaries']['PGD'], 'model': "A'",
@@ -54,38 +63,40 @@ config['eval']['final_metrics']['adversaries'] = [
     {**config['adversaries']['PGD'], 'model': "A'",
      'k': 100, 'restarts': 20, 'theirs': .957},
     {**config['adversaries']['PGD'], 'model': "A'",
-     '': 'CW', 'name': 'CW', 'theirs': .970},
+     '': 'CW', 'name': 'CW', 'confidence': 20, 'restarts': 1, 'theirs': .970},
     {**config['adversaries']['PGD'], 'model': "A'",
-     '': 'CW', 'k': 50, 'name': 'CW+', 'theirs': .964},
+     '': 'CW', 'confidence': 50, 'restarts': 1, 'name': 'CW+', 'theirs': .964},
 
     # FGSM B,
     # PGD 40 1 B,
     # CW+ B
 ]
+
 theirs = []
-for i, o in enumerate(config['eval']['final_metrics']['adversaries']):
-    o['name'] = f'{i}'
-    theirs.append(o['theirs'])
-    del o['theirs']
+config['eval']['final_metrics'] = []
+for adversary in adversaries:
+    theirs.append(adversary.pop('theirs'))
+    config['eval']['final_metrics'].append(
+        {'adversaries': [adversary], 'metrics': ['accuracy']}
+    )
 del config['adversaries']
+
 log.info('-'*20)
 log.info('NEW RUN')
 log.info('-'*20)
 log.info('\n'+pprint.pformat(config))
 log.info('---')
-_results = trainer.eval(config)
-print(_results)
-results = []
-for _result in _results:
-    for i, o in enumerate(config['eval']['final_metrics']['adversaries']):
-        to_append = copy.deepcopy(o)
-        o['adversary'] = o['']
-        del o['']
-        results.append({
-            **o,
-            'accuracy': _result[f'{i}_accuracy'],
-            'theirs': theirs[i],
-        })
+results = trainer.eval(config)
+for result, x, conf in zip(results, theirs, adversaries):
+    result['theirs'] = x
+    result['steps'] = conf.get('k', '-')
+    result['restarts'] = conf.get('restarts', '-')
+    result['source'] = conf.get('model', 'A')
+    for k in list(result):
+        if m := re.fullmatch('(.+)_accuracy', k):
+            result['name'] = m[1]
+            result['accuracy'] = result.pop(k)
+print(results)
 
 log.info(results)
 df = pd.DataFrame(results)

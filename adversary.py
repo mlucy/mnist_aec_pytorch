@@ -173,18 +173,18 @@ class PGD(Adversary):
 
 class CWConfig(PGDConfig):
     _defaults = {
-        'k': 0,
+        'confidence': 0,
     }
 class CW(PGD):
     def __init__(self, **config):
         self.config = CWConfig(config)
 
-    # Adapted from pg. 10 of https://arxiv.org/pdf/1608.04644.pdf The
-    # main difference is that A) We're doing PGD instead of trying to
-    # find the smallest attack that works, and B) We're trying to get
-    # any wrong answer rather than a specific target, so the max is
-    # flipped.
-    def loss_fn(self, logits, ys):
+    # Adapted from pg. 10 of https://arxiv.org/pdf/1608.04644.pdf.
+    # The main difference is that A) We're doing PGD instead of trying
+    # to find the smallest attack that works, and B) We're trying to
+    # get any wrong answer rather than a specific target, so the max
+    # is flipped.
+    def loss_fn(self, logits, ys, reduce=None):
         c = self.config
         batch_sz, n_cls = logits.shape
         arange = torch.arange(n_cls, device=logits.device)
@@ -195,20 +195,27 @@ class CW(PGD):
         max_true_logit = torch.max(
             torch.where(true_val_mask, logits, ninf),
             dim=1,
-        )
+        ).values
         max_false_logit = torch.max(
             torch.where(true_val_mask.logical_not(), logits, ninf),
             dim=1,
-        )
+        ).values
         # This step doesn't really make sense for PGD.  Normally the
         # idea is to make the network just-barely-wrong and then
         # minimize distance, but now that we're allowed to be up to
         # epsilon wrong, this just stopes us from optimizing once we
         # reach a known certainty.  Maybe we're supposed to still be
         # minimizing distance?  The paper is unclear.
-        return torch.max(max_true_logit - max_false_logit, -c.k)
+        loss = torch.max(max_false_logit - max_true_logit,
+                         torch.tensor(-c.confidence))
+        if reduce is None:
+            return torch.mean(loss)
+        elif reduce is False:
+            return loss
+        else:
+            raise RuntimeError(f'unsupported loss reduction {reduce}')
 
     def perturb(self, start_point, grad_cb):
         def new_grad_cb(point):
             return grad_cb(point, loss_fn=self.loss_fn)
-        super().perturb(start_point, new_grad_cb)
+        return super().perturb(start_point, new_grad_cb)

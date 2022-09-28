@@ -2,14 +2,20 @@
 
 All results are compared to https://arxiv.org/pdf/1706.06083.pdf
 
-I reproduced the graphs in section 5, Experiments, for MNIST but not
-for CIFAR.  It would potentially be interesting to reproduce figures 1
-and 2 from the earlier sections as well.
+I reproduced the graphs in Section 5 (Experiments) for MNIST.  It
+would potentially be interesting to reproduce figures 1 and 2 from the
+earlier sections as well.
 
 Their adversarial training scheme is super slow (40 steps of PGD per
 outer step of training), so I didn't reproduce the CIFAR results yet.
 
-
+To reproduce e.g. experiment 1:
+```
+cd mnist_aec_pytorch/experiments
+python exp1.py
+python exp1_plot.py results/exp1.df
+open results/exp1.png
+```
 
 
 # Experiment 1 (Figure 4)
@@ -58,7 +64,9 @@ That seems suspicious to me, I should double-check the training code.
 
 I'm not sure what their "Targeted" attack is, and I had to guess some
 of the details for the CW/CW+ attacks.  I haven't looked into model B
-yet.  Otherwise very similar.
+yet.
+
+TODO: why are our restart numbers so high?
 
 # Experiment 4 (Figure 6):
 

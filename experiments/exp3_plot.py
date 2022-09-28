@@ -18,11 +18,7 @@ ax = fig.gca()
 ax.axis('off')
 ax.axis('tight')
 
-res = res[['adversary', 'k', 'restarts', 'model', 'accuracy', 'theirs']]
-res.update(res[['model']].applymap(
-    lambda x: 'A' if isinstance(x, float) and math.isnan(x) else x
-))
-res.update(res.applymap(lambda x: '-' if isinstance(x, float) and math.isnan(x) else x))
+res = res[['name', 'steps', 'restarts', 'source', 'accuracy', 'theirs']]
 res.update(res[['accuracy']].applymap(lambda x: f'{x:.3f}'))
 res.update(res.applymap(
     lambda x: f'{x:g}' if isinstance(x, float) else x

@@ -67,6 +67,7 @@ class Trainer(utils.Writable):
             'MNIST': model.Mnist,
             'FGSM': adversary.FGSM,
             'PGD': adversary.PGD,
+            'CW': adversary.CW,
             'ID': adversary.ID,
         }
         cls = subconfig.pop('')
@@ -99,8 +100,8 @@ class Trainer(utils.Writable):
                 out_str += f' ({batch_per_sec})'
                 log.info(out_str)
 
-    def grad_cb(self, ys, loss_fn=None):
-        def f(points):
+    def grad_cb(self, ys):
+        def f(points, loss_fn=None):
             # TODO: should we be explicitly setting train to True or False
             # here?  Probably it's fine either way.
             with torch.enable_grad():
@@ -216,6 +217,7 @@ def train_test_metrics(_train_config):
 
 @utils.fs_cacheable()
 def eval(config):
+    trainer_hash = utils.json_hash(config['trainer'])
     trainer = train(config['trainer'])
     data_points = []
     other_trainers = {}
@@ -224,6 +226,21 @@ def eval(config):
     final_metrics = config['eval']['final_metrics']
     if isinstance(final_metrics, dict):
         final_metrics = [final_metrics]
+
+    @utils.fs_cacheable(version=f'v1-{trainer_hash}')
+    def sub_eval(final_metric, adversary_config):
+        adversary = Trainer.subconfig(**adversary_config)
+        adversary_trainer = trainer
+        if getattr(adversary.config, 'model', None) is not None:
+            adversary_trainer = other_trainers[adversary.config.model]
+        log.info(f'Evaluating on {adversary_config}.')
+        results = trainer._test(adversary, adversary_trainer)
+        patch = {
+            f'{adversary.config.name}_{k}': results[k]
+            for k in final_metric['metrics']
+        }
+        return patch
+
     for final_metric in final_metrics:
         obj = {
             'step': trainer.step,
@@ -232,16 +249,7 @@ def eval(config):
             **final_metric.get('tags', {}),
         }
         for adversary_config in final_metric['adversaries']:
-            adversary = Trainer.subconfig(**adversary_config)
-            adversary_trainer = trainer
-            if getattr(adversary.config, 'model', None) is not None:
-                adversary_trainer = other_trainers[adversary.config.model]
-            log.info(f'Evaluating on {adversary_config}.')
-            results = trainer._test(adversary, adversary_trainer)
-            patch = {
-                f'{adversary.config.name}_{k}': results[k]
-                for k in final_metric['metrics']
-            }
+            patch = sub_eval(final_metric, adversary_config)
             obj = {**obj, **patch}
         data_points.append(obj)
     return data_points

@@ -6,7 +6,10 @@
   in [0, 256) and then does lattice search if that isn't good enough.
   This paper seems to just let us pass arbitrary floats.  Try it both ways?
 
+* Add a requirements file.
 
+* Add lock-holding for the training cache so experiments can be run in
+  parallel without re-doing work?
 
 ## Thoughts
 
@@ -21,7 +24,10 @@
   this would behave if we patched the ReLU units to pass through
   gradients as if they were softmax (just lie basically)?
 
-* I wonder how things behave if instead of training against adversarial attacks within an epsilon ball, the value of epsilon is sampled at training time from some distribution?  Would that get similar results without the sharp dropoff past that epsilon ball?
+* I wonder how things behave if instead of training against
+  adversarial attacks within an epsilon ball, the value of epsilon is
+  sampled at training time from some distribution?  Would that get
+  similar results without the sharp dropoff past that epsilon ball?
 
 * The only scaling experiments look at width, I wonder how depth
   affects things?
