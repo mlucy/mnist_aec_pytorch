@@ -53,6 +53,8 @@ That seems suspicious to me, I should double-check the training code.
 (This might also explain the persistently-slightly-higher loss in
 Experiment 3 if there's some training difference.)
 
+
+
 # Experiment 3 (Table 1)
 
 ## Theirs:
@@ -72,7 +74,7 @@ TODO:
 
 * I don't understand the attack they labeled "Targeted", I can't seem
   to find where they describe it in the paper.
-* I don't know what to set the convidence parameter to for CW (for CW+
+* I don't know what to set the confidence parameter to for CW (for CW+
   they specify 50).  I ended up going with 20 (see comments in
   exp3.py).
 * Why are our accuracy numbers consistently a little higher?  Seems
