@@ -36,6 +36,12 @@ class Mnist(nn.Module):
 
     @classmethod
     def loss(_, logits, y, reduce=None):
+        # TODO: I think they might be using a `sum` reduction for
+        # training even though they use an `avg` reduction for the
+        # reported numbers in the paper?  That might explain some of
+        # the minor numerical differences, although with Adam as the
+        # optimizer it shouldn't be super sensitive to the scale of
+        # the loss.
         return F.cross_entropy(logits, y, reduce=reduce)
 
     @classmethod

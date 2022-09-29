@@ -53,7 +53,10 @@ That seems suspicious to me, I should double-check the training code.
 (This might also explain the persistently-slightly-higher loss in
 Experiment 3 if there's some training difference.)
 
-
+I copied some of the details like batch size from
+https://github.com/MadryLab/mnist_challenge , and it seems to give
+mostly similar numbers, but it's possible they used a slightly
+different configuration for the paper.
 
 # Experiment 3 (Table 1)
 
