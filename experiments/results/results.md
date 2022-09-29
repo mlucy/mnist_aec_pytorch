@@ -46,9 +46,11 @@ the training and see if it was just an outlier.
 
 ## Thoughts
 
-Overall these look very similar.  We seem to bottom out and start
+Overall these look kind of similar.  We seem to bottom out and start
 rising in loss earlier than they do and at a slightly higher loss.
 That seems suspicious to me, I should double-check the training code.
+
+The difference is less than it looks like because of the log scale.
 
 (This might also explain the persistently-slightly-higher loss in
 Experiment 3 if there's some training difference.)
