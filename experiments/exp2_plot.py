@@ -16,7 +16,7 @@ ax.set_ylabel('Loss Value')
 ax.set_yscale('log')
 ax.set_xlabel('Iterations')
 ax.yaxis.set_major_formatter(mpl.ticker.FormatStrFormatter('%.2f'))
-#ax.set_ylim(bottom=0.01, top=1.5)
+ax.set_ylim(bottom=0.09, top=1.5)
 
 xs = res['test']['step'].to_numpy()
 ys = res['test']['loss'].to_numpy()
