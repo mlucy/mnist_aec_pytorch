@@ -30,9 +30,13 @@ open results/exp1.png
 
 ## Thoughts
 
-Overall these look very similar.  Our capacity 4/8 seems to be
-behaving slightly differently, not sure why, should probably re-run
-the training and see if it was just an outlier.
+Not quite the same.  We seem to be doing worse at capacity 4 and
+better at capacity 8.  (Also our capacity 2 on PGD training has
+already entered the good paradigm.)
+
+I'm not sure if this is random noise from network initialization or if
+there's an implementation difference I haven't found.  TODO: look into
+this more, re-run the tests.
 
 # Experiment 2 (Figure 5)
 
