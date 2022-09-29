@@ -1,7 +1,5 @@
 ## TODO
 
-* Our PGD-with-restarts seems like is has a bug.
-
 * Add a requirements file.
 
 * Add lock-holding for the training cache so experiments can be run in

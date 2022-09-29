@@ -67,12 +67,13 @@ higher.
 
 TODO:
 
-* Our accuracy numbers for restarts=20 seem wrong, probably a bug.
-* I don't understand the attack they labeled "Targetted", I can't seem
+* I don't understand the attack they labeled "Targeted", I can't seem
   to find where they describe it in the paper.
 * I don't know what to set the convidence parameter to for CW (for CW+
   they specify 50).  I ended up going with 20 (see comments in
   exp3.py).
+* Why are our accuracy numbers consistently a little higher?  Seems
+  odd, seems true over multiple runs.  Might be nothing.
 
 # Experiment 4 (Figure 6):
 

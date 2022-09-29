@@ -45,6 +45,7 @@
             'k': 40,
             'a': 0.01,
             'random_start': true,
+            'restarts': 1,
         },
     },
 }

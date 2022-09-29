@@ -169,6 +169,11 @@ class PGD(Adversary):
                 best,
                 cur,
             )
+            best_loss = torch.where(
+                (best_loss > loss),
+                best_loss,
+                loss,
+            )
         return best
 
 class CWConfig(PGDConfig):
