@@ -71,8 +71,7 @@ I ended up graphing accuracy vs. step size for 40 and 100 steps, and
 also avg. ling distance vs. step size for both the clipped and
 unclipped distance.
 
-#### Attacks against an adversarially-trained network using the
-     paper's step-taking algorithm:
+#### Attacks against an adversarially-trained network using the paper's step-taking algorithm:
 
 ![](exp5_PGD.png)
 
