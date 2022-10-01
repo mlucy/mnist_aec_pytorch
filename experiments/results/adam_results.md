@@ -83,8 +83,7 @@ unclipped distance.
 
 * It's interesting that in the case of the paper's step-taking method,
   the optimal step size for accuracy is also the step size where
-  distance bottoms out, but that this doesn't seem to be true for
-  Adam.
+  clipped linf distance first bottoms out.
 * It's interesting that Adam needs such a large step size to get close
   to the shell.
 * It's interesting that going from 40 to 100 steps improves accuracy,
