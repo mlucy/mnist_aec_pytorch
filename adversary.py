@@ -1,11 +1,23 @@
 import utils
 import torch
+from torch import nn
 import numpy as np
+
+class NormableConfig(utils.Config):
+    _defaults = {
+        'eps': 0.3,
+        'norm': 'linf',
+        'step_mode': 'paper',
+    }
 
 class LinfNorm:
     def __init__(self, config, start_point):
         c = self.config = config
         self.start_point = start_point
+
+        if c.step_mode == 'adam':
+            self.adam_extractor = nn.Parameter(torch.zeros_like(self.start_point))
+            self.adam_opt = torch.optim.Adam([self.adam_extractor], lr=1)
 
         # We want to make sure we never produce an invalid image.
         # Note: pytorch is insane, so the second argument has to be
@@ -14,6 +26,41 @@ class LinfNorm:
         self.minval = torch.max(self.start_point - c.eps, torch.tensor(0))
         self.maxval = torch.min(self.start_point + c.eps, torch.tensor(1))
 
+    def metrics(self, point):
+        return {
+            'shell_d': torch.mean(self.shell_dist(point)).item(),
+            'shell_du': torch.mean(self.shell_dist_unclipped(point)).item(),
+            'shell_pd': torch.mean(self.shell_pseudodist(point)).item(),
+            'shell_pdu': torch.mean(self.shell_pseudodist_unclipped(point)).item(),
+        }
+
+    def raw_dist(self, point, clipped=True):
+        c = self.config
+        if clipped:
+            dist_top = self.maxval - point
+            dist_bot = point - self.minval
+        else:
+            dist_top = (self.start_point + c.eps) - point
+            dist_bot = point - (self.start_point - c.eps)
+        dist = torch.min(dist_top, dist_bot)
+        return dist.reshape(dist.shape[0], -1)
+
+    def shell_dist(self, point):
+        dist = self.raw_dist(point)
+        return torch.min(dist, dim=1).values
+
+    def shell_dist_unclipped(self, point):
+        dist = self.raw_dist(point, clipped=False)
+        return torch.min(dist, dim=1).values
+
+    def shell_pseudodist(self, point):
+        dist = self.raw_dist(point)
+        return torch.mean(dist, dim=1)
+
+    def shell_pseudodist_unclipped(self, point):
+        dist = self.raw_dist(point, clipped=False)
+        return torch.mean(dist, dim=1)
+
     def random_uniform(self):
         c = self.config
         noise = (torch.rand_like(self.start_point) * c.eps * 2) - c.eps
@@ -21,7 +68,20 @@ class LinfNorm:
 
     def step(self, point, grad):
         c = self.config
-        return self.project(point + c.a * torch.sign(grad))
+        if c.step_mode == 'paper':
+            return self.project(point + c.a * torch.sign(grad))
+        elif c.step_mode == 'adam':
+            # TODO: I should probably just re-implement tracking the
+            # first and second moments instead of doing this song and
+            # dance.
+            with torch.no_grad():
+                self.adam_extractor.zero_()
+                self.adam_extractor.grad = grad
+                self.adam_opt.step()
+                extracted_step = -self.adam_extractor
+            return self.project(point + c.a * extracted_step)
+        else:
+            assert False
 
     def project(self, point):
         return point.clip(min=self.minval, max=self.maxval)
@@ -43,6 +103,9 @@ class L2Norm:
         self.maxval = torch.ones_like(start_point)
 
         self.shape = (1, 28, 28)
+
+    def metrics(self, _):
+        return {}
 
     def vector_norm(self, vec):
         # Unlike the functions for the Linf norm, we need to care
@@ -89,6 +152,24 @@ class L2Norm:
         return self.project(point + 2*c.eps*self.grad/self.vector_norm(grad))
 
 class Adversary:
+    def __init__(self):
+        self.metrics_acc = {}
+        self.metrics_n = {}
+
+    def update_metrics(self, obj):
+        for k, v in obj.items():
+            if k not in self.metrics_acc:
+                self.metrics_acc[k] = 0
+                self.metrics_n[k] = 0
+            self.metrics_acc[k] += v
+            self.metrics_n[k] += 1
+
+    def metrics(self):
+        return {
+            k: self.metrics_acc[k] / self.metrics_n[k]
+            for k in self.metrics_acc
+        }
+
     def make_norm(self, start_point):
         c = self.config
         cls = {
@@ -108,16 +189,15 @@ class ID(Adversary):
     def perturb(self, start_point, grad_cb):
         return start_point
 
-class FGSMConfig(utils.Config):
+class FGSMConfig(NormableConfig):
     _defaults = {
         'name': 'FGSM',
-        'eps': 0.3,
         'random_start': False,
-        'norm': 'linf',
         'model': None,
     }
 class FGSM(Adversary):
     def __init__(self, **config):
+        super().__init__()
         self.config = FGSMConfig(config)
 
     def perturb(self, start_point, grad_cb):
@@ -131,19 +211,18 @@ class FGSM(Adversary):
         grad, _loss = grad_cb(cur)
         return norm.max_shell(cur, grad)
 
-class PGDConfig(utils.Config):
+class PGDConfig(NormableConfig):
     _defaults = {
         'name': 'PGD',
-        'eps': 0.3,
         'k': 40,
         'a': 0.01,
         'random_start': True,
         'restarts': 1,
-        'norm': 'linf',
         'model': None,
     }
 class PGD(Adversary):
     def __init__(self, **config):
+        super().__init__()
         self.config = PGDConfig(config)
 
     def perturb(self, start_point, grad_cb):
@@ -151,6 +230,7 @@ class PGD(Adversary):
         best_loss = start_point.new_full(start_point.shape[:1], -torch.inf)
         best = torch.zeros_like(start_point)
         for _ in range(c.restarts):
+            # Important to do this inside restarts for LinfNorm_ADAM case.
             norm = self.make_norm(start_point)
             if c.random_start:
                 cur = norm.random_uniform()
@@ -174,6 +254,7 @@ class PGD(Adversary):
                 best_loss,
                 loss,
             )
+        self.update_metrics(norm.metrics(best))
         return best
 
 class CWConfig(PGDConfig):
@@ -182,6 +263,7 @@ class CWConfig(PGDConfig):
     }
 class CW(PGD):
     def __init__(self, **config):
+        Adversary.__init__(self)
         self.config = CWConfig(config)
 
     # Adapted from pg. 10 of https://arxiv.org/pdf/1608.04644.pdf.

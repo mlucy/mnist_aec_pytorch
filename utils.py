@@ -53,7 +53,7 @@ def json_hash(obj):
     encoded = json.dumps(obj, sort_keys=True)
     return str(uuid.uuid5(uuid.NAMESPACE_OID, encoded))
 
-def fs_cacheable(path='.cache', version='v1'):
+def fs_cacheable(path='.cache', version='v2'):
     def __f(f):
         def _f(*a, **kw):
             os.makedirs(path, exist_ok=True)

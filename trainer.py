@@ -227,7 +227,7 @@ def eval(config):
     if isinstance(final_metrics, dict):
         final_metrics = [final_metrics]
 
-    @utils.fs_cacheable(version=f'v1-{trainer_hash}')
+    @utils.fs_cacheable(version=f'v2-{trainer_hash}')
     def sub_eval(final_metric, adversary_config):
         adversary = Trainer.subconfig(**adversary_config)
         adversary_trainer = trainer
@@ -239,6 +239,7 @@ def eval(config):
             f'{adversary.config.name}_{k}': results[k]
             for k in final_metric['metrics']
         }
+        patch = {**patch, **adversary.metrics()}
         return patch
 
     for final_metric in final_metrics:

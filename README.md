@@ -2,6 +2,15 @@
 
 * Add a requirements file.
 
+* Try Adam for PGD update.
+  - Check how often we actually get to the shell.
+  - Seems like behavior is bad if we try to step past the shell
+    multiple times and learn an unreasonable level of certainty.
+
+* Try fast FGSM: https://arxiv.org/abs/2001.03994
+
+* Try early stopping: https://arxiv.org/pdf/2002.11569.pdf
+
 * Add lock-holding for the training cache so experiments can be run in
   parallel without re-doing work?
 
