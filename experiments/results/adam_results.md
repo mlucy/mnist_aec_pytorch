@@ -57,7 +57,7 @@ shell clipped to those values.
 
 1. If we consider distance the the unclipped shell, we have the
 annoying property that we can't actually reach the shell, so no matter
-what the step-taking algorithm is going we stop getting closer to it
+what the step-taking algorithm is doing we stop getting closer to it
 at some point.
 
 2. If we consider the distance to the clipped shell, we have the
