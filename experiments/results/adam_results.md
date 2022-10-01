@@ -68,7 +68,7 @@ y).min()` useless even if you have a fixed starting point.
 ## Graphs
 
 I ended up graphing accuracy vs. step size for 40 and 100 steps, and
-also avg. ling distance vs. step size for both the clipped and
+also avg. linf distance vs. step size for both the clipped and
 unclipped distance.
 
 #### Attacks against an adversarially-trained network using the paper's step-taking algorithm:
