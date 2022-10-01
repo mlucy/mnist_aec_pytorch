@@ -40,7 +40,7 @@ worst-behaved dimension out of a bunch of them").
 
 2. Looking at `d(x, y) = (|x - y|).min()` seemed like it might be
 helpful, because for a small step size you would expect to never reach
-the shell for any parameter, but in practice with random starts
+the shell for any dimension, but in practice with random starts
 usually you reach the shell with at least one, so this was just
 constant.  (And for non-random starts you run into the clipped-shell
 problem below.)
