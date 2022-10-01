@@ -26,6 +26,7 @@ for adam_train in [False, True]:
             '': 'PGD',
             **config['adversaries']['PGD'],
             'name': 'ADAM_PGD',
+            'a': 0.3,
             'step_mode': 'adam',
         }
     else:
