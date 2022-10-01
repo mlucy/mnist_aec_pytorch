@@ -42,7 +42,7 @@ worst-behaved dimension out of a bunch of them").
 helpful, because for a small step size you would expect to never reach
 the shell for any parameter, but in practice with random starts
 usually you reach the shell with at least one, so this was just
-random.  (And for non-random starts you run into the clipped-shell
+constant.  (And for non-random starts you run into the clipped-shell
 problem below.)
 
 3. I ended up looking at `d(x, y) = (x - y).mean()`, which I guess you
