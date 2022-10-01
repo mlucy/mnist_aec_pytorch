@@ -34,18 +34,18 @@ This turned out to be kind of not the right thing, for two reasons:
 #### Linf distance sucks
 
 1. Looking at the linf distance to the shell (in the sense of `d(x, y)
-= (|x - y|).max()`) didn't really measure the thing we cared about
+= abs(x-y).max()`) didn't really measure the thing we cared about
 because it was basically random ("how well-behaved was the
 worst-behaved dimension out of a bunch of them").
 
-2. Looking at `d(x, y) = (|x - y|).min()` seemed like it might be
+2. Looking at `d(x, y) = abs(x-y).min()` seemed like it might be
 helpful, because for a small step size you would expect to never reach
 the shell for any dimension, but in practice with random starts
 usually you reach the shell with at least one, so this was just
 constant.  (And for non-random starts you run into the clipped-shell
 problem below.)
 
-3. I ended up looking at `d(x, y) = (|x - y|).mean()`, which I guess you
+3. I ended up looking at `d(x, y) = abs(x-y).mean()`, which I guess you
 could argue kind of makes sense, and produces graphs which are at
 least interesting.
 
@@ -62,8 +62,8 @@ at some point.
 
 2. If we consider the distance to the clipped shell, we have the
 annoying property that images with lots of white start out with most
-of the pixels already on the shell, which makes `d(x, y) = (x -
-y).min()` useless even if you have a fixed starting point.
+of the pixels already on the shell, which makes `d(x, y) =
+abs(x-y).min()` useless even if you have a fixed starting point.
 
 ## Graphs
 
