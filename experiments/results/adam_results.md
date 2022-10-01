@@ -55,7 +55,7 @@ We have an linf shell around our image, but we also clip the pixel
 values to be in the range `[0, 1)`.  So our actual shell is the linf
 shell clipped to those values.
 
-1. If we consider distance the the unclipped shell, we have the
+1. If we consider distance to the unclipped shell, we have the
 annoying property that we can't actually reach the shell, so no matter
 what the step-taking algorithm is doing we stop getting closer to it
 at some point.
